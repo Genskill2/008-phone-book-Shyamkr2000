@@ -14,6 +14,7 @@ typedef struct entry0 entry;
 
 /* Command handlers */
 void add(char *, char *);
+int search(FILE *,char *);
 void list(FILE *);
 int delete(FILE *, char *);
 
@@ -34,26 +35,6 @@ void write_all_entries(entry *); /* Given the first node of a linked
                                     list of entries, will delete the
                                     database file on the disk and save
                                     the given entries into the file */
-int search(FILE *db_file,char *name)
-{
-  entry *p = load_entries(db_file);
-  entry *base = p;
-  entry *searched = NULL;
-  int s = 0;
-  while(p != NULL)
-  {
-    if(strcmp(p->name, name) == 0)
-    {
-      printf("%s\n", p->phone);
-       s = 1;
-       break;
-    }
-    p = p->next;
-  }
-  write_all_entries(base); 
-  free_entries(base);
-  return s;
-}
 
 
 int main(int argc, char *argv[]) {
@@ -80,9 +61,36 @@ int main(int argc, char *argv[]) {
     list(fp);
     fclose(fp);
     exit(0);
-  } else if (strcmp(argv[1], "search") == 0) {  /* Handle search */
-    printf("NOT IMPLEMENTED!\n"); /* TBD  */
-  } else if (strcmp(argv[1], "delete") == 0) {  /* Handle delete */
+  } 
+  
+  else if (strcmp(argv[1], "search") == 0) {  
+    if (argc != 3) 
+    {
+      print_usage("Improper arguments for list", argv[0]);
+      exit(1);
+    }
+
+    char *name = argv[2];
+
+    FILE *fp = open_db_file();
+    if(search(fp, name) == 0)
+    {  
+        printf("no match\n");
+        fclose(fp);
+        exit(1);
+        fclose(fp);
+        exit(1);
+     }
+    else
+    {
+      search(fp, name);
+      fclose(fp);
+      exit(0);
+    }
+    
+  }
+  
+  else if (strcmp(argv[1], "delete") == 0) {  /* Handle delete */
     if (argc != 3) {
       print_usage("Improper arguments for delete", argv[0]);
       exit(1);
@@ -111,13 +119,17 @@ FILE *open_db_file() {
   return fp;
 }
   
-void free_entries(entry *p) {
-  /* TBD */
-  entry *temp=p;
-  while(p!=NULL){
-      free(temp);
-      p=p+1;
-      } 
+void free_entries(entry *p) 
+{    /*TDB*/
+    entry* temp = p;
+  while(p!= NULL)
+  {
+    temp = p;
+    free(temp);
+    p = p.next;
+
+  }
+   
 }
 
 void print_usage(char *message, char *progname) {
@@ -198,17 +210,15 @@ void add(char *name, char *phone) {
 void list(FILE *db_file) {
   entry *p = load_entries(db_file);
   entry *base = p;
-  int count=0;
+  int count = 0;
   while (p!=NULL) {
     printf("%-20s : %10s\n", p->name, p->phone);
-    p=p->next;
     count++;
+    p=p->next;
   }
-  printf("Total entries :  %d\n",count);
-  /* TBD print total count */
-  free_entries(base);
+   printf("Total entries :  %d\n",count);
+   free_entries(base);
 }
-
 
 int delete(FILE *db_file, char *name) {
   entry *p = load_entries(db_file);
@@ -216,43 +226,54 @@ int delete(FILE *db_file, char *name) {
   entry *prev = NULL;
   entry *del = NULL ; /* Node to be deleted */
   int deleted = 0;
-  while (p!=NULL) {
-    if (strcmp(p->name, name) == 0) {
-        if(prev == NULL)
+while(p != NULL)
+{
+   if(strcmp(p->name, name) == 0)
+   {
+       if(prev == NULL)
        {
-           base = p+1;
+           base = p.next;
            free(p);
            deleted = 1;
            break;
        }
+
        else
-       {   prev++;
-           prev= p+1;
+       {   
+           prev.next = p.next;
            deleted = 1;
            free(p);
            break;
        }
    }
     prev = p;
-    p = p+1;
-        
-        
-      /* Matching node found. Delete it from the linked list.
-         Deletion from a linked list like this
-   
-             p0 -> p1 -> p2
-         
-         means we have to make p0->next point directly to p2. The p1
-         "node" is removed and free'd.
-         
-         If the node to be deleted is p0, it's a special case. 
-      */
-
-      /* TBD */
-    
-  }
+    p = p.next;
+}
+  
   write_all_entries(base);
   free_entries(base);
-  return deleted;
+    return deleted;
 }
+ 
+ 
 
+int search(FILE *db_file,char *name)
+{
+  entry *p = load_entries(db_file);
+  entry *base = p;
+  entry *searched = NULL;
+  int s = 0;
+  while(p != NULL)
+  {
+    if(strcmp(p.name, name) == 0)
+    {
+      printf("%s\n", p.phone);
+       s = 1;
+       break;
+    }
+    p = p.next;
+  }
+  write_all_entries(base); 
+  free_entries(base);
+  return s;
+}
