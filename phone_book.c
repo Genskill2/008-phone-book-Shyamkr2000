@@ -14,7 +14,26 @@ typedef struct entry0 entry;
 
 /* Command handlers */
 void add(char *, char *);
-int search(FILE *,char *);
+int search(FILE *db_file,char *name)
+{
+  entry *p = load_entries(db_file);
+  entry *base = p;
+  entry *searched = NULL;
+  int s = 0;
+  while(p != NULL)
+  {
+    if(strcmp(p->name, name) == 0)
+    {
+      printf("%s\n", p->phone);
+       s = 1;
+       break;
+    }
+    p = p->next;
+  }
+  write_all_entries(base); 
+  free_entries(base);
+  return s;
+}
 void list(FILE *);
 int delete(FILE *, char *);
 
@@ -236,3 +255,4 @@ int delete(FILE *db_file, char *name) {
   free_entries(base);
   return deleted;
 }
+
