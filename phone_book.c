@@ -94,7 +94,11 @@ FILE *open_db_file() {
   
 void free_entries(entry *p) {
   /* TBD */
-  printf("Memory is not being freed. This needs to be fixed!\n");  
+  entry *temp=p;
+  while(p!=NULL){
+      free(temp);
+      p=p+1;
+      } 
 }
 
 void print_usage(char *message, char *progname) {
@@ -131,20 +135,17 @@ entry *load_entries(FILE *fp) {
   entry *tmp = NULL;
   /* Description of %20[^,\n]
      % is the start of the specifier (like %s, %i etc.)
-
      20 is the maximum number of characters that this will take. We
         know that names and phone numbers will be 20 bytes maximum so
         we limit it to that. %20s will read in 20 character strings
         (including the , to separate the name and phone number. That's
         why we use
-
     [^,\n] Square brackets are used to indicate a set of allowed
            characters [abc] means only a, b, or c. With the ^, it's
            used to specify a set of disallowed characters. So [^abc]
            means any character *except* a, b, or c. [^,] means any
            character except a , [^,\n] means any character except a
            comma(,) or a newline(\n).
-
     %20[^,\n] will match a string of characters with a maximum length
      of 20 characters that doesn't have a comma(,) or a newline(\n).
   */        
@@ -178,10 +179,13 @@ void add(char *name, char *phone) {
 void list(FILE *db_file) {
   entry *p = load_entries(db_file);
   entry *base = p;
+  int count=0;
   while (p!=NULL) {
     printf("%-20s : %10s\n", p->name, p->phone);
     p=p->next;
+    count++;
   }
+  printf("Total entries :  %d\n",count);
   /* TBD print total count */
   free_entries(base);
 }
@@ -195,6 +199,25 @@ int delete(FILE *db_file, char *name) {
   int deleted = 0;
   while (p!=NULL) {
     if (strcmp(p->name, name) == 0) {
+        if(prev == NULL)
+       {
+           base = p+1;
+           free(p);
+           deleted = 1;
+           break;
+       }
+       else
+       {   prev++;
+           prev= p+1;
+           deleted = 1;
+           free(p);
+           break;
+       }
+   }
+    prev = p;
+    p = p+1;
+        
+        
       /* Matching node found. Delete it from the linked list.
          Deletion from a linked list like this
    
