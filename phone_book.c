@@ -14,26 +14,6 @@ typedef struct entry0 entry;
 
 /* Command handlers */
 void add(char *, char *);
-int search(FILE *db_file,char *name)
-{
-  entry *p = load_entries(db_file);
-  entry *base = p;
-  entry *searched = NULL;
-  int s = 0;
-  while(p != NULL)
-  {
-    if(strcmp(p->name, name) == 0)
-    {
-      printf("%s\n", p->phone);
-       s = 1;
-       break;
-    }
-    p = p->next;
-  }
-  write_all_entries(base); 
-  free_entries(base);
-  return s;
-}
 void list(FILE *);
 int delete(FILE *, char *);
 
@@ -54,6 +34,26 @@ void write_all_entries(entry *); /* Given the first node of a linked
                                     list of entries, will delete the
                                     database file on the disk and save
                                     the given entries into the file */
+int search(FILE *db_file,char *name)
+{
+  entry *p = load_entries(db_file);
+  entry *base = p;
+  entry *searched = NULL;
+  int s = 0;
+  while(p != NULL)
+  {
+    if(strcmp(p->name, name) == 0)
+    {
+      printf("%s\n", p->phone);
+       s = 1;
+       break;
+    }
+    p = p->next;
+  }
+  write_all_entries(base); 
+  free_entries(base);
+  return s;
+}
 
 
 int main(int argc, char *argv[]) {
