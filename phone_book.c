@@ -120,13 +120,13 @@ FILE *open_db_file() {
 }
   
 void free_entries(entry *p) 
-{    /*TDB*/
+{
     entry* temp = p;
   while(p!= NULL)
   {
     temp = p;
     free(temp);
-    p = p.next;
+    p = p->next;
 
   }
    
@@ -217,7 +217,10 @@ void list(FILE *db_file) {
     p=p->next;
   }
    printf("Total entries :  %d\n",count);
-   free_entries(base);
+ // printf("Total entries : ");            // added count
+  //printf("%d\n", count);
+
+  free_entries(base);
 }
 
 int delete(FILE *db_file, char *name) {
@@ -232,7 +235,7 @@ while(p != NULL)
    {
        if(prev == NULL)
        {
-           base = p.next;
+           base = p->next;
            free(p);
            deleted = 1;
            break;
@@ -240,14 +243,14 @@ while(p != NULL)
 
        else
        {   
-           prev.next = p.next;
+           prev->next = p->next;
            deleted = 1;
            free(p);
            break;
        }
    }
     prev = p;
-    p = p.next;
+    p = p->next;
 }
   
   write_all_entries(base);
@@ -265,13 +268,13 @@ int search(FILE *db_file,char *name)
   int s = 0;
   while(p != NULL)
   {
-    if(strcmp(p.name, name) == 0)
+    if(strcmp(p->name, name) == 0)
     {
-      printf("%s\n", p.phone);
+      printf("%s\n", p->phone);
        s = 1;
        break;
     }
-    p = p.next;
+    p = p->next;
   }
   write_all_entries(base); 
   free_entries(base);
